@@ -213,4 +213,4 @@ if __name__ == "__main__":
     print(f"[*] Клиентский сайт: http://localhost:{port}/")
     print(f"[*] Рабочий пульт (Workspace CRM): http://localhost:{port}/workspace")
     print(f"==================================================")
-    web.run_app(app, host="127.0.0.1", port=port)
+    web.run_app(app, host="0.0.0.0", port=port)
