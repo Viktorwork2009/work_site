@@ -6,38 +6,58 @@
   <title>Developer Workspace | Панель управления & CRM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f19;
-      --sidebar-bg: #111827;
-      --card-bg: #1f2937;
-      --border: #374151;
+      --bg: #090c15;
+      --sidebar-bg: #0f1422;
+      --card-bg: #141a2c;
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(59, 130, 246, 0.35);
+      
       --primary: #3b82f6;
       --primary-hover: #2563eb;
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --text: #f9fafb;
-      --text-muted: #9ca3af;
+      
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
       --font-mono: 'JetBrains Mono', monospace;
+      --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Inter', system-ui, sans-serif;
+      font-family: var(--font-main);
       min-height: 100vh;
       display: flex;
+    }
+
+    /* Icon Utility */
+    .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex-shrink: 0;
     }
 
     /* Auth Overlay */
     #auth-overlay {
       position: fixed;
       inset: 0;
-      background: radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.15) 0%, rgba(11, 15, 25, 0.95) 70%);
-      backdrop-filter: blur(8px);
+      background: radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.12) 0%, rgba(9, 12, 21, 0.98) 75%);
+      backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -46,33 +66,32 @@
     }
 
     .auth-card {
-      background: #111827;
-      border: 1px solid var(--border);
+      background: #0f1422;
+      border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 36px 32px;
+      padding: 40px 32px;
       width: 100%;
       max-width: 420px;
       text-align: center;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
     }
 
     .auth-icon {
-      width: 52px;
-      height: 52px;
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      width: 48px;
+      height: 48px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
       color: #60a5fa;
       border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
       margin: 0 auto 20px;
     }
 
     .auth-card h2 {
-      font-size: 1.4rem;
-      font-weight: 800;
+      font-size: 1.35rem;
+      font-weight: 700;
       margin-bottom: 8px;
     }
 
@@ -84,8 +103,8 @@
     }
 
     .auth-error {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
       color: #f87171;
       padding: 10px 14px;
       border-radius: 8px;
@@ -105,7 +124,7 @@
     .sidebar {
       width: 260px;
       background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
+      border-right: 1px solid var(--card-border);
       display: flex;
       flex-direction: column;
       padding: 24px 16px;
@@ -115,8 +134,8 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1.15rem;
+      gap: 12px;
+      font-size: 1.1rem;
       font-weight: 800;
       color: white;
       margin-bottom: 32px;
@@ -124,34 +143,34 @@
     }
 
     .brand-icon {
-      background: var(--primary);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-mono);
-      font-weight: 800;
     }
 
     .nav-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 11px 14px;
       color: var(--text-muted);
       border-radius: 8px;
       text-decoration: none;
       font-weight: 600;
-      font-size: 0.95rem;
-      margin-bottom: 6px;
+      font-size: 0.92rem;
+      margin-bottom: 4px;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .nav-item:hover, .nav-item.active {
-      background: rgba(59, 130, 246, 0.15);
+      background: rgba(59, 130, 246, 0.12);
       color: #60a5fa;
     }
 
@@ -163,8 +182,8 @@
     }
 
     .external-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
       color: var(--text);
       padding: 10px;
       border-radius: 8px;
@@ -173,16 +192,19 @@
       text-decoration: none;
       font-size: 0.85rem;
       transition: background 0.2s;
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .external-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .logout-btn {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.2);
       color: #f87171;
       padding: 10px;
       border-radius: 8px;
@@ -191,18 +213,21 @@
       font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s;
-      border-style: solid;
       width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.22);
+      background: rgba(239, 68, 68, 0.18);
     }
 
     /* Main Content */
     .main {
       flex: 1;
-      padding: 32px;
+      padding: 32px 40px;
       overflow-y: auto;
     }
 
@@ -210,34 +235,36 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .page-title {
-      font-size: 1.75rem;
+      font-size: 1.65rem;
       font-weight: 800;
+      letter-spacing: -0.5px;
     }
 
     /* Stat Cards */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      gap: 18px;
       margin-bottom: 32px;
     }
 
     .stat-card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 20px;
     }
 
     .stat-label {
-      color: var(--text-muted);
-      font-size: 0.85rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
 
@@ -252,12 +279,12 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* Tables & Lists */
+    /* Tables & Cards */
     .card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
       border-radius: 14px;
-      padding: 24px;
+      padding: 26px;
       margin-bottom: 32px;
     }
 
@@ -269,7 +296,7 @@
     }
 
     .card-header h3 {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
     }
 
@@ -280,6 +307,10 @@
       cursor: pointer;
       border: none;
       transition: all 0.2s;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .btn-primary { background: var(--primary); color: white; }
@@ -292,33 +323,35 @@
     }
 
     th {
-      color: var(--text-muted);
-      font-size: 0.8rem;
+      color: var(--text-dim);
+      font-size: 0.78rem;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--card-border);
       padding: 12px 16px;
     }
 
     td {
       padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.92rem;
     }
 
     .status-badge {
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .status-new { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
-    .status-in_progress { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
-    .status-done { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-new { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .status-in_progress { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .status-done { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
 
-    /* Modals & Forms */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -328,13 +361,13 @@
 
     .form-ctrl {
       width: 100%;
-      background: #111827;
-      border: 1px solid var(--border);
+      background: #090c15;
+      border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 10px 14px;
       color: white;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
 
     .form-ctrl:focus {
@@ -345,16 +378,21 @@
 </head>
 <body>
 
-  <!-- Auth Screen Modal (Displayed if unauthorized) -->
+  <!-- Auth Screen Modal -->
   <div id="auth-overlay" style="display: none;">
     <div class="auth-card">
-      <div class="auth-icon">🔒</div>
-      <h2>Вход в панель управления</h2>
-      <p>Доступ к CRM, входящим заявкам и доходам закрыт для посторонних.</p>
+      <div class="auth-icon">
+        <svg class="icon" viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+      </div>
+      <h2>Панель управления</h2>
+      <p>Вход защищен. Введите пароль для доступа к CRM и задачам.</p>
       <div id="auth-error-msg" class="auth-error"></div>
       <form id="auth-form">
-        <input type="password" id="auth-password" class="form-ctrl" placeholder="Введите пароль доступа" required autofocus style="margin-bottom: 14px; text-align: center;">
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;">Войти в панель</button>
+        <input type="password" id="auth-password" class="form-ctrl" placeholder="Пароль доступа" required autofocus style="margin-bottom: 14px; text-align: center;">
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">Войти в панель</button>
       </form>
     </div>
   </div>
@@ -364,26 +402,55 @@
     <!-- Left Sidebar -->
     <aside class="sidebar">
       <div class="brand">
-        <div class="brand-icon">⌘</div>
-        <span>Dev Workspace</span>
+        <div class="brand-icon">
+          <svg class="icon" viewBox="0 0 24 24">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </div>
+        <span>Workspace</span>
       </div>
 
       <div class="nav-item active" onclick="switchTab('dashboard')">
-        📊 Дашборд & CRM
+        <svg class="icon" viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="9"></rect>
+          <rect x="14" y="3" width="7" height="5"></rect>
+          <rect x="14" y="12" width="7" height="9"></rect>
+          <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
+        <span>Дашборд & CRM</span>
       </div>
       <div class="nav-item" onclick="switchTab('projects-tab')">
-        💼 Мои проекты
+        <svg class="icon" viewBox="0 0 24 24">
+          <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+          <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+        </svg>
+        <span>Кейсы на сайте</span>
       </div>
       <div class="nav-item" onclick="switchTab('tasks-tab')">
-        ✅ Задачи & Доход
+        <svg class="icon" viewBox="0 0 24 24">
+          <polyline points="9 11 12 14 22 4"></polyline>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span>Задачи & Доход</span>
       </div>
 
       <div class="sidebar-footer">
         <a href="/" target="_blank" class="external-btn">
-          🌐 Сайт для клиентов
+          <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Сайт клиентов</span>
         </a>
         <button onclick="handleLogout()" class="logout-btn">
-          🚪 Завершить сессию
+          <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Завершить сессию</span>
         </button>
       </div>
     </aside>
@@ -394,17 +461,24 @@
       <!-- Tab 1: Dashboard & Leads CRM -->
       <div id="dashboard" class="tab-content active">
         <div class="top-header">
-          <h1 class="page-title">Сводка & Лиды с Авито/Сайта</h1>
-          <button class="btn btn-primary" onclick="refreshData()">🔄 Обновить</button>
+          <h1 class="page-title">Сводка & Лиды с Авито</h1>
+          <button class="btn btn-primary" onclick="refreshData()">
+            <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Обновить</span>
+          </button>
         </div>
 
         <div class="stats-grid">
           <div class="stat-card">
-            <div class="stat-label">Всего заявок (CRM)</div>
+            <div class="stat-label">Всего заявок в CRM</div>
             <div class="stat-value" id="stat-leads-count">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Проектов в каталоге</div>
+            <div class="stat-label">Кейсов в каталоге</div>
             <div class="stat-value" id="stat-projects-count">0</div>
           </div>
           <div class="stat-card">
@@ -433,9 +507,7 @@
                 <th>Действие</th>
               </tr>
             </thead>
-            <tbody id="leads-table-body">
-              <!-- Dynamic leads -->
-            </tbody>
+            <tbody id="leads-table-body"></tbody>
           </table>
         </div>
       </div>
@@ -443,35 +515,33 @@
       <!-- Tab 2: Projects Management -->
       <div id="projects-tab" class="tab-content">
         <div class="top-header">
-          <h1 class="page-title">Управление проектами витрины</h1>
+          <h1 class="page-title">Управление кейсами витрины</h1>
         </div>
 
-        <!-- Add Project Card -->
         <div class="card">
           <div class="card-header">
-            <h3>➕ Добавить новый проект на сайт</h3>
+            <h3>Опубликовать проект на сайт</h3>
           </div>
           <form id="add-proj-form">
             <div class="form-grid">
-              <input type="text" id="p-title" class="form-ctrl" placeholder="Название бота (например: Бот для автосервиса)" required>
-              <input type="text" id="p-category" class="form-ctrl" placeholder="Категория (Авто, Доставка, E-Commerce)" required>
-              <input type="text" id="p-price" class="form-ctrl" placeholder="Цена (например: от 3 500 ₽)" required>
-              <input type="text" id="p-days" class="form-ctrl" placeholder="Срок (например: 1-2 дня)" required>
+              <input type="text" id="p-title" class="form-ctrl" placeholder="Название бота" required>
+              <input type="text" id="p-category" class="form-ctrl" placeholder="Категория" required>
+              <input type="text" id="p-price" class="form-ctrl" placeholder="Цена (от 3 500 ₽)" required>
+              <input type="text" id="p-days" class="form-ctrl" placeholder="Срок (1–2 дня)" required>
             </div>
             <div style="margin-bottom: 16px;">
-              <input type="text" id="p-features" class="form-ctrl" placeholder="Фичи через запятую: Запись на ТО, Калькулятор, Напоминания в TG" required>
+              <input type="text" id="p-features" class="form-ctrl" placeholder="Особенности через запятую: Запись клиентов, Оплата, Напоминания" required>
             </div>
             <div style="margin-bottom: 16px;">
-              <textarea id="p-desc" class="form-ctrl" rows="2" placeholder="Краткое продающее описание проекта..."></textarea>
+              <textarea id="p-desc" class="form-ctrl" rows="2" placeholder="Краткое описание функционала бота..."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Опубликовать на клиентском сайте</button>
+            <button type="submit" class="btn btn-primary">Опубликовать кейс</button>
           </form>
         </div>
 
-        <!-- Projects List -->
         <div class="card">
           <div class="card-header">
-            <h3>Опубликованные кейсы</h3>
+            <h3>Опубликованные решения</h3>
           </div>
           <table>
             <thead>
@@ -491,22 +561,22 @@
       <!-- Tab 3: Tasks Management -->
       <div id="tasks-tab" class="tab-content">
         <div class="top-header">
-          <h1 class="page-title">Трекер задач & Заработок</h1>
+          <h1 class="page-title">Задачи & Доход</h1>
         </div>
 
         <div class="card">
           <div class="card-header">
-            <h3>➕ Добавить рабочую задачу</h3>
+            <h3>Новая задача в работу</h3>
           </div>
           <form id="add-task-form">
             <div class="form-grid">
-              <input type="text" id="t-title" class="form-ctrl" placeholder="Что нужно сделать?" required>
+              <input type="text" id="t-title" class="form-ctrl" placeholder="Название задачи" required>
               <input type="number" id="t-price" class="form-ctrl" placeholder="Оплата (₽)" value="3000">
               <input type="text" id="t-deadline" class="form-ctrl" placeholder="Дедлайн (Сегодня, 2 дня)">
               <select id="t-priority" class="form-ctrl">
                 <option value="normal">Обычный приоритет</option>
                 <option value="high">Высокий</option>
-                <option value="urgent">Срочно (Лид ждет ответ)</option>
+                <option value="urgent">Срочно</option>
               </select>
             </div>
             <button type="submit" class="btn btn-primary">Добавить задачу</button>
@@ -638,17 +708,17 @@
             <td style="font-family: var(--font-mono); color: #34d399; font-weight: 700;">${l.budget}</td>
             <td>${l.task || '—'}</td>
             <td>
-              <select onchange="updateLeadStatus('${l.id}', this.value)" class="form-ctrl" style="padding: 4px 8px; font-size: 0.8rem;">
+              <select onchange="updateLeadStatus('${l.id}', this.value)" class="form-ctrl" style="padding: 4px 8px; font-size: 0.82rem;">
                 <option value="new" ${l.status==='new'?'selected':''}>Новый лид</option>
                 <option value="in_progress" ${l.status==='in_progress'?'selected':''}>В работе</option>
                 <option value="done" ${l.status==='done'?'selected':''}>Оплачен / Сдан</option>
               </select>
             </td>
             <td>
-              <button onclick="takeLeadToTask('${l.name}', '${l.budget}')" class="btn" style="background: rgba(59,130,246,0.2); color:#60a5fa; font-size:0.8rem;">В задачи</button>
+              <button onclick="takeLeadToTask('${l.name}', '${l.budget}')" class="btn" style="background: rgba(59,130,246,0.15); color:#60a5fa; font-size:0.8rem;">В задачи</button>
             </td>
           </tr>
-        `).join('') : `<tr><td colspan="7" style="text-align:center; color: var(--text-muted);">Заявок пока нет. Опубликуйте ссылку на сайт в объявлении на Авито!</td></tr>`;
+        `).join('') : `<tr><td colspan="7" style="text-align:center; color: var(--text-dim); padding: 24px;">Заявок пока нет. Опубликуйте ссылку в объявлении на Авито.</td></tr>`;
 
         // 2. Projects
         const resProj = await apiFetch('/api/projects');
@@ -663,7 +733,7 @@
             <td style="color: #34d399; font-family: var(--font-mono);">${p.price}</td>
             <td>${p.days}</td>
             <td>
-              <button onclick="deleteProject('${p.id}')" class="btn" style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 0.8rem;">Удалить</button>
+              <button onclick="deleteProject('${p.id}')" class="btn" style="background: rgba(239,68,68,0.15); color: #f87171; font-size: 0.8rem;">Удалить</button>
             </td>
           </tr>
         `).join('');
@@ -679,25 +749,23 @@
         const tbodyTasks = document.getElementById('tasks-table-body');
         tbodyTasks.innerHTML = tasks.map(t => `
           <tr>
-            <td style="font-weight: 600; text-decoration: ${t.status==='done'?'line-through':'none'}; color: ${t.status==='done'?'var(--text-muted)':'var(--text)'};">
+            <td style="font-weight: 600; text-decoration: ${t.status==='done'?'line-through':'none'}; color: ${t.status==='done'?'var(--text-dim)':'var(--text)'};">
               ${t.title}
             </td>
             <td style="font-family: var(--font-mono); color: #34d399;">${t.price ? t.price.toLocaleString('ru-RU') + ' ₽' : '—'}</td>
             <td>${t.deadline}</td>
             <td>
               <span class="status-badge status-${t.status}">
-                ${t.status==='done'?'Выполнено':(t.status==='in_progress'?'В процессе':'В очереди')}
+                ${t.status==='done'?'Выполнено':(t.status==='in_progress'?'В работе':'В очереди')}
               </span>
             </td>
             <td>
-              ${t.status !== 'done' ? `<button onclick="toggleTask('${t.id}', 'done')" class="btn" style="background: rgba(16,185,129,0.2); color: #34d399; font-size: 0.8rem; margin-right: 4px;">✓ Готово</button>` : ''}
-              <button onclick="deleteTask('${t.id}')" class="btn" style="background: rgba(239,68,68,0.2); color: #f87171; font-size: 0.8rem;">✕</button>
+              ${t.status !== 'done' ? `<button onclick="toggleTask('${t.id}', 'done')" class="btn" style="background: rgba(16,185,129,0.15); color: #34d399; font-size: 0.8rem; margin-right: 4px;">Сдать</button>` : ''}
+              <button onclick="deleteTask('${t.id}')" class="btn" style="background: rgba(239,68,68,0.15); color: #f87171; font-size: 0.8rem;">Удалить</button>
             </td>
           </tr>
         `).join('');
-      } catch (e) {
-        // Handled in apiFetch if 401
-      }
+      } catch (e) {}
     }
 
     async function updateLeadStatus(id, status) {
@@ -741,7 +809,6 @@
           deadline: '2 дня'
         })
       });
-      alert('Лид успешно перенесен в задачи!');
       refreshData();
     }
 
@@ -782,7 +849,6 @@
       refreshData();
     });
 
-    // Check auth on page load
     checkAuth();
   </script>
 </body>

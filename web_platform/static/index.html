@@ -6,56 +6,75 @@
   <title>BotCraft Studio | Разработка Telegram-ботов для бизнеса</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: rgba(22, 28, 45, 0.7);
+      --bg: #090c15;
+      --bg-surface: #0f1422;
+      --bg-surface-elevated: #161c2e;
       --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-hover: rgba(59, 130, 246, 0.5);
+      --card-border-hover: rgba(59, 130, 246, 0.35);
+      
       --primary: #3b82f6;
       --primary-hover: #2563eb;
+      --primary-glow: rgba(59, 130, 246, 0.15);
+      
       --accent: #10b981;
-      --accent-glow: rgba(16, 185, 129, 0.25);
-      --text-main: #f8fafc;
+      --accent-glow: rgba(16, 185, 129, 0.12);
+      
+      --text: #f8fafc;
       --text-muted: #94a3b8;
-      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --text-dim: #64748b;
+      
+      --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
     body {
       background-color: var(--bg);
-      color: var(--text-main);
-      font-family: var(--font-sans);
+      color: var(--text);
+      font-family: var(--font-main);
       line-height: 1.6;
       overflow-x: hidden;
       background-image: 
-        radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 85% 65%, rgba(16, 185, 129, 0.1) 0%, transparent 45%),
-        linear-gradient(to bottom, #090d16, #05070c);
+        radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
       min-height: 100vh;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1180px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
+    /* SVG icon utility */
+    .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    /* Header */
     header {
-      padding: 24px 0;
+      padding: 20px 0;
       border-bottom: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       position: sticky;
       top: 0;
       z-index: 50;
-      background: rgba(9, 13, 22, 0.8);
+      background: rgba(9, 12, 21, 0.85);
     }
 
     .header-content {
@@ -68,230 +87,259 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: -0.5px;
-      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.3px;
+      color: var(--text);
       text-decoration: none;
     }
 
     .logo-badge {
-      background: linear-gradient(135deg, #3b82f6, #10b981);
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--card-border);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      color: white;
-      font-size: 1rem;
+      color: var(--primary);
     }
 
     .header-nav {
       display: flex;
-      gap: 20px;
+      gap: 28px;
       align-items: center;
     }
 
     .nav-link {
       color: var(--text-muted);
       text-decoration: none;
+      font-size: 0.92rem;
       font-weight: 500;
       transition: color 0.2s;
     }
 
-    .nav-link:hover {
-      color: var(--text-main);
-    }
+    .nav-link:hover { color: var(--text); }
 
     .btn-header {
-      background: rgba(59, 130, 246, 0.1);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 8px 16px;
+      background: var(--bg-surface-elevated);
+      color: var(--text);
+      border: 1px solid var(--card-border);
+      padding: 9px 18px;
       border-radius: 8px;
+      font-size: 0.88rem;
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .btn-header:hover {
-      background: rgba(59, 130, 246, 0.2);
-      border-color: #60a5fa;
-      color: #fff;
+      border-color: var(--primary);
+      color: #60a5fa;
     }
 
     /* Hero Section */
     .hero {
-      padding: 90px 0 60px;
+      padding: 80px 0 60px;
       text-align: center;
-      position: relative;
+      max-width: 860px;
+      margin: 0 auto;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
       padding: 6px 14px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
       border-radius: 999px;
-      font-size: 0.875rem;
+      font-size: 0.82rem;
       font-weight: 600;
+      color: var(--text-muted);
       margin-bottom: 24px;
     }
 
     .hero-badge-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 10px #10b981;
+      box-shadow: 0 0 8px var(--accent);
     }
 
-    .hero h1 {
-      font-size: 3.5rem;
+    h1 {
+      font-size: 3rem;
+      line-height: 1.18;
       font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1.15;
-      margin-bottom: 24px;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      color: #ffffff;
     }
 
-    .hero h1 span {
-      background: linear-gradient(135deg, #60a5fa 20%, #34d399 80%);
+    h1 span {
+      background: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero p {
-      font-size: 1.25rem;
+    .hero-p {
+      font-size: 1.15rem;
       color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto 36px;
+      margin-bottom: 36px;
+      line-height: 1.65;
+      font-weight: 400;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .hero-actions {
       display: flex;
       justify-content: center;
       gap: 16px;
-      margin-bottom: 50px;
+      flex-wrap: wrap;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      background: var(--primary);
       color: white;
-      padding: 14px 28px;
-      border-radius: 10px;
+      padding: 13px 26px;
+      border-radius: 9px;
+      font-size: 0.95rem;
       font-weight: 600;
-      font-size: 1.05rem;
       text-decoration: none;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid transparent;
       transition: all 0.2s;
+      cursor: pointer;
     }
 
     .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.6);
+      background: var(--primary-hover);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
-      padding: 14px 28px;
-      border-radius: 10px;
+      background: var(--bg-surface);
+      color: var(--text);
+      padding: 13px 26px;
+      border-radius: 9px;
+      font-size: 0.95rem;
       font-weight: 600;
-      font-size: 1.05rem;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       border: 1px solid var(--card-border);
       transition: all 0.2s;
+      cursor: pointer;
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--bg-surface-elevated);
       border-color: rgba(255, 255, 255, 0.2);
     }
 
     /* Trust highlights */
     .highlights {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-bottom: 80px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 90px;
     }
 
     .highlight-card {
-      background: var(--card-bg);
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      padding: 20px;
       border-radius: 12px;
+      padding: 22px 20px;
       display: flex;
-      align-items: center;
-      gap: 16px;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color 0.2s, transform 0.2s;
     }
 
-    .highlight-icon {
-      font-size: 1.75rem;
+    .highlight-card:hover {
+      border-color: var(--card-border-hover);
+      transform: translateY(-2px);
+    }
+
+    .highlight-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--card-border);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .highlight-info h4 {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       margin-bottom: 4px;
+      color: var(--text);
     }
 
     .highlight-info p {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
+      line-height: 1.45;
     }
 
-    /* Showcase grid */
+    /* Section Headings */
     .section-head {
       text-align: center;
-      margin-bottom: 48px;
+      margin-bottom: 44px;
     }
 
     .section-head h2 {
-      font-size: 2.25rem;
+      font-size: 2.1rem;
       font-weight: 800;
-      margin-bottom: 12px;
       letter-spacing: -0.5px;
+      margin-bottom: 10px;
     }
 
     .section-head p {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
 
+    /* Projects Grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 28px;
-      margin-bottom: 80px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 100px;
     }
 
     .project-card {
-      background: var(--card-bg);
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 28px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
+      transition: all 0.2s ease;
     }
 
     .project-card:hover {
       border-color: var(--card-border-hover);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
     }
 
     .card-top {
@@ -301,36 +349,43 @@
       margin-bottom: 16px;
     }
 
-    .badge {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      color: #60a5fa;
-      padding: 4px 10px;
-      border-radius: 6px;
+    .category-tag {
       font-size: 0.75rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      color: #60a5fa;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
     }
 
-    .category {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
+    .badge-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(16, 185, 129, 0.2);
     }
 
     .card-title {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      margin-bottom: 12px;
-      line-height: 1.3;
+      margin-bottom: 10px;
+      line-height: 1.35;
+      color: white;
     }
 
     .card-desc {
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       margin-bottom: 20px;
-      min-height: 60px;
+      line-height: 1.6;
     }
 
     .features-list {
@@ -338,21 +393,21 @@
       margin-bottom: 24px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .features-list li {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: #cbd5e1;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .features-list li::before {
-      content: "✓";
-      color: var(--accent);
-      font-weight: 800;
+    .features-list li svg {
+      color: #10b981;
+      width: 16px;
+      height: 16px;
     }
 
     .card-bottom {
@@ -363,62 +418,53 @@
       align-items: center;
     }
 
-    .price-block {
-      display: flex;
-      flex-direction: column;
-    }
-
     .price-label {
       font-size: 0.75rem;
-      color: var(--text-muted);
+      color: var(--text-dim);
       text-transform: uppercase;
+      font-weight: 600;
+      display: block;
     }
 
     .price-value {
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       font-weight: 800;
-      color: #34d399;
       font-family: var(--font-mono);
+      color: #f8fafc;
     }
 
     .btn-order {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.4);
-      color: #93c5fd;
+      background: var(--bg-surface-elevated);
+      color: var(--text);
+      border: 1px solid var(--card-border);
       padding: 8px 16px;
       border-radius: 8px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .btn-order:hover {
-      background: #3b82f6;
+      background: var(--primary);
+      border-color: var(--primary);
       color: white;
     }
 
-    /* Calculator & Order section */
+    /* Order & Calculator Section */
     .lead-section {
-      background: linear-gradient(180deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+      background: var(--bg-surface);
       border: 1px solid var(--card-border);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 48px;
-      margin-bottom: 80px;
+      margin-bottom: 100px;
     }
 
     .lead-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-    }
-
-    @media (max-width: 868px) {
-      .lead-grid {
-        grid-template-columns: 1fr;
-      }
-      .hero h1 {
-        font-size: 2.5rem;
-      }
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: start;
     }
 
     .form-group {
@@ -427,18 +473,18 @@
 
     .form-label {
       display: block;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 8px;
-      color: #e2e8f0;
+      color: var(--text-muted);
     }
 
     .form-input, .form-textarea, .form-select {
       width: 100%;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px 16px;
+      background: #090c15;
+      border: 1px solid var(--card-border);
+      border-radius: 9px;
+      padding: 12px 14px;
       color: white;
       font-family: inherit;
       font-size: 0.95rem;
@@ -447,109 +493,223 @@
 
     .form-input:focus, .form-textarea:focus, .form-select:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
     .calc-box {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      padding: 24px;
+      background: #090c15;
+      border-radius: 14px;
+      padding: 28px;
       border: 1px solid var(--card-border);
     }
 
-    .calc-row {
+    .calc-box h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    .checkbox-item {
       display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      padding: 10px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      transition: all 0.2s;
       color: var(--text-muted);
-      font-size: 0.95rem;
+    }
+
+    .checkbox-item:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: var(--text);
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
     }
 
     .calc-total {
       border-top: 1px solid var(--card-border);
-      padding-top: 16px;
-      margin-top: 16px;
+      padding-top: 20px;
+      margin-top: 24px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-end;
     }
 
     .calc-total-val {
-      font-size: 1.75rem;
+      font-size: 1.85rem;
       font-weight: 800;
       color: #34d399;
       font-family: var(--font-mono);
+      line-height: 1;
+      margin-top: 6px;
+    }
+
+    /* Notification Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      border: 1px solid var(--primary);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
     footer {
       border-top: 1px solid var(--card-border);
       padding: 40px 0;
       text-align: center;
-      color: var(--text-muted);
-      font-size: 0.9rem;
+      color: var(--text-dim);
+      font-size: 0.88rem;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 900px) {
+      .highlights { grid-template-columns: repeat(2, 1fr); }
+      .lead-grid { grid-template-columns: 1fr; gap: 32px; }
+      .lead-section { padding: 28px; }
+      h1 { font-size: 2.3rem; }
+    }
+
+    @media (max-width: 600px) {
+      .highlights { grid-template-columns: 1fr; }
+      .header-nav .nav-link { display: none; }
+      h1 { font-size: 1.9rem; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
     <div class="container header-content">
       <a href="#" class="logo">
-        <div class="logo-badge">⚡</div>
+        <div class="logo-badge">
+          <svg class="icon" viewBox="0 0 24 24">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </div>
         <span>BotCraft Studio</span>
       </a>
       <nav class="header-nav">
-        <a href="#projects" class="nav-link">Кейсы и проекты</a>
-        <a href="#order" class="nav-link">Калькулятор цен</a>
-        <a href="#order" class="btn-header">⚡ Рассчитать стоимость</a>
+        <a href="#projects" class="nav-link">Решения</a>
+        <a href="#order" class="nav-link">Калькулятор</a>
+        <a href="#order" class="btn-header">
+          <span>Рассчитать стоимость</span>
+          <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
       </nav>
     </div>
   </header>
 
   <main class="container">
+    <!-- Hero Section -->
     <section class="hero">
       <div class="hero-badge">
         <span class="hero-badge-dot"></span>
-        Работаем на Авито и под заказ • Гарантия запуска 100%
+        Официальный запуск на Авито и под заказ
       </div>
       <h1>Разработка Telegram-ботов<br><span>для бизнеса под ключ</span></h1>
-      <p>Автоматизируем продажи, клиентский сервис и прием заявок. Готовые отказоустойчивые решения на Python от 3 000 ₽ со сдачей за 1–3 дня.</p>
+      <p class="hero-p">
+        Автоматизируем прием заявок, клиентский сервис и продажи. Готовые отказоустойчивые решения на Python с базовой стоимостью строго от 3 000 ₽ со сдачей за 1–3 дня.
+      </p>
       
       <div class="hero-actions">
-        <a href="#order" class="btn-primary">Рассчитать стоимость</a>
-        <a href="#projects" class="btn-secondary">Посмотреть проекты</a>
+        <a href="#order" class="btn-primary">
+          <span>Рассчитать стоимость</span>
+          <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+        <a href="#projects" class="btn-secondary">
+          <span>Готовые решения</span>
+        </a>
       </div>
     </section>
 
     <!-- Highlights -->
     <div class="highlights">
       <div class="highlight-card">
-        <div class="highlight-icon">⏱️</div>
+        <div class="highlight-icon-box">
+          <svg class="icon" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
         <div class="highlight-info">
-          <h4>Срок 1–3 дня</h4>
-          <p>Быстрый запуск без затягиваний</p>
+          <h4>Сроки 1–3 дня</h4>
+          <p>Быстрый запуск и настройка без лишних затягиваний</p>
         </div>
       </div>
+
       <div class="highlight-card">
-        <div class="highlight-icon">🛡️</div>
+        <div class="highlight-icon-box">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
         <div class="highlight-info">
           <h4>Отказоустойчивость</h4>
-          <p>Защита от сбоев и флуд-лимитов</p>
+          <p>Защита от сбоев и флуд-лимитов Telegram API</p>
         </div>
       </div>
+
       <div class="highlight-card">
-        <div class="highlight-icon">💰</div>
+        <div class="highlight-icon-box">
+          <svg class="icon" viewBox="0 0 24 24">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
         <div class="highlight-info">
           <h4>Прозрачные цены</h4>
-          <p>Базовый тариф строго от 3 000 ₽</p>
+          <p>Фиксированные тарифы Авито строго от 3 000 ₽</p>
         </div>
       </div>
+
       <div class="highlight-card">
-        <div class="highlight-icon">🚀</div>
+        <div class="highlight-icon-box">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
         <div class="highlight-info">
-          <h4>Под ключ</h4>
-          <p>Хостинг, запуск и инструкция в комплекте</p>
+          <h4>Запуск под ключ</h4>
+          <p>Инструкция по управлению, хостинг и гарантия</p>
         </div>
       </div>
     </div>
@@ -557,8 +717,8 @@
     <!-- Projects Section -->
     <section id="projects">
       <div class="section-head">
-        <h2>Портфолио & Готовые решения</h2>
-        <p>Выберите подходящий формат или закажите индивидуальную разработку</p>
+        <h2>Каталог решений</h2>
+        <p>Протестированные конфигурации с возможностью доработки под ваши задачи</p>
       </div>
 
       <div class="grid" id="projects-grid">
@@ -566,13 +726,14 @@
       </div>
     </section>
 
-    <!-- Lead / Order Form -->
+    <!-- Calculator & Order Section -->
     <section id="order" class="lead-section">
       <div class="lead-grid">
+        <!-- Left: Form -->
         <div>
-          <h2 style="font-size: 2rem; font-weight: 800; margin-bottom: 12px;">Оставить заявку на расчет</h2>
-          <p style="color: var(--text-muted); margin-bottom: 28px;">
-            Заполните форму, и мы свяжемся с вами в Telegram или WhatsApp в течение 10 минут с готовым предложением и сметой.
+          <h2 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px;">Оставить заявку на расчет</h2>
+          <p style="color: var(--text-muted); margin-bottom: 28px; font-size: 0.95rem;">
+            Заполните контакты, и мы свяжемся с вами в течение 10 минут с готовой сметой и вариантами реализации.
           </p>
 
           <form id="lead-form">
@@ -588,16 +749,23 @@
 
             <div class="form-group">
               <label class="form-label">Какая задача у бота?</label>
-              <textarea id="lead-task" rows="3" class="form-textarea" placeholder="Кратко опишите: прием заказов, автоответчик, воронка продаж или интеграция..."></textarea>
+              <textarea id="lead-task" rows="3" class="form-textarea" placeholder="Кратко опишите задачу: автоответчик, прием заказов, воронка или консультация..."></textarea>
             </div>
 
-            <button type="submit" class="btn-primary" style="width: 100%;">Отправить заявку</button>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 14px;">
+              <span>Отправить заявку</span>
+              <svg class="icon" style="width: 16px; height: 16px;" viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
           </form>
         </div>
 
+        <!-- Right: Calculator -->
         <div>
           <div class="calc-box">
-            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 20px;">Калькулятор стоимости</h3>
+            <h3>Интерактивный калькулятор стоимости</h3>
 
             <div class="form-group">
               <label class="form-label">Тип решения</label>
@@ -611,27 +779,30 @@
 
             <div class="form-group">
               <label class="form-label">Дополнительные опции</label>
-              <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 8px;">
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
-                  <input type="checkbox" id="opt-db" value="1000"> База данных SQLite/PostgreSQL (+1 000 ₽)
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <label class="checkbox-item">
+                  <input type="checkbox" id="opt-db" value="1000">
+                  <span>База данных SQLite / PostgreSQL (+1 000 ₽)</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
-                  <input type="checkbox" id="opt-pay" value="1500"> Подключение онлайн-оплаты ЮKassa / СБП (+1 500 ₽)
+                <label class="checkbox-item">
+                  <input type="checkbox" id="opt-pay" value="1500">
+                  <span>Подключение онлайн-оплаты ЮKassa / СБП (+1 500 ₽)</span>
                 </label>
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; cursor: pointer;">
-                  <input type="checkbox" id="opt-sheets" value="1000"> Интеграция с Google Таблицами (+1 000 ₽)
+                <label class="checkbox-item">
+                  <input type="checkbox" id="opt-sheets" value="1000">
+                  <span>Синхронизация с Google Таблицами (+1 000 ₽)</span>
                 </label>
               </div>
             </div>
 
             <div class="calc-total">
               <div>
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Итоговая стоимость:</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Итоговая стоимость:</div>
                 <div class="calc-total-val" id="calc-total-display">4 500 ₽</div>
               </div>
               <div style="text-align: right;">
-                <div style="font-size: 0.85rem; color: var(--text-muted);">Срок готовности:</div>
-                <div style="font-weight: 700; color: #60a5fa;" id="calc-days-display">1-2 дня</div>
+                <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; font-weight: 600;">Срок сдачи:</div>
+                <div style="font-weight: 700; color: #60a5fa; font-size: 1.15rem; margin-top: 6px;" id="calc-days-display">1–2 дня</div>
               </div>
             </div>
           </div>
@@ -640,6 +811,15 @@
     </section>
   </main>
 
+  <!-- Notification Toast -->
+  <div id="toast">
+    <svg class="icon" style="color: #34d399;" viewBox="0 0 24 24">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <span id="toast-text">Заявка успешно отправлена!</span>
+  </div>
+
   <footer>
     <div class="container">
       <p>© 2026 BotCraft Studio. Разработка Telegram-ботов для Авито и бизнеса. Официальная гарантия и сопровождение.</p>
@@ -647,6 +827,13 @@
   </footer>
 
   <script>
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
     // Load and render projects
     async function loadProjects() {
       try {
@@ -657,13 +844,20 @@
           <div class="project-card">
             <div>
               <div class="card-top">
-                <span class="category">${p.category}</span>
-                <span class="badge">${p.badge || 'Проект'}</span>
+                <span class="category-tag">${p.category}</span>
+                <span class="badge-tag">${p.badge || 'Проект'}</span>
               </div>
               <h3 class="card-title">${p.title}</h3>
               <p class="card-desc">${p.description}</p>
               <ul class="features-list">
-                ${(p.features || []).map(f => `<li>${f}</li>`).join('')}
+                ${(p.features || []).map(f => `
+                  <li>
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>${f}</span>
+                  </li>
+                `).join('')}
               </ul>
             </div>
             <div class="card-bottom">
@@ -671,7 +865,7 @@
                 <span class="price-label">Стоимость под ключ</span>
                 <span class="price-value">${p.price}</span>
               </div>
-              <button class="btn-order" onclick="selectProject('${p.title}', '${p.price}')">Заказать</button>
+              <button class="btn-order" onclick="selectProject('${p.title}', '${p.price}')">Выбрать</button>
             </div>
           </div>
         `).join('');
@@ -695,9 +889,9 @@
 
       document.getElementById('calc-total-display').innerText = total.toLocaleString('ru-RU') + ' ₽';
       
-      let days = "1-2 дня";
-      if (total >= 7000) days = "3-4 дня";
-      else if (total >= 5000) days = "2-3 дня";
+      let days = "1–2 дня";
+      if (total >= 7000) days = "3–4 дня";
+      else if (total >= 5000) days = "2–3 дня";
       document.getElementById('calc-days-display').innerText = days;
     }
 
@@ -723,10 +917,10 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        alert(data.message || 'Заявка отправлена!');
+        showToast(data.message || 'Заявка успешно отправлена! Мы свяжемся с вами в течение 10 минут.');
         document.getElementById('lead-form').reset();
       } catch (err) {
-        alert('Ошибка при отправке. Попробуйте еще раз.');
+        showToast('Ошибка при отправке заявки. Попробуйте еще раз.');
       }
     });
 
