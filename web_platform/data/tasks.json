@@ -1,0 +1,26 @@
+[
+  {
+    "id": "t1",
+    "title": "Опубликовать объявление на Авито",
+    "status": "done",
+    "priority": "high",
+    "price": 0,
+    "deadline": "Сегодня"
+  },
+  {
+    "id": "t2",
+    "title": "Ответить первому лиду по боту-магазину",
+    "status": "in_progress",
+    "priority": "urgent",
+    "price": 4500,
+    "deadline": "Срочно"
+  },
+  {
+    "id": "t3",
+    "title": "Подготовить демо-бота для клиента с Авито",
+    "status": "pending",
+    "priority": "medium",
+    "price": 3000,
+    "deadline": "Завтра"
+  }
+]

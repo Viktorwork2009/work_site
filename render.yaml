@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: botcraft-platform
+    env: python
+    buildCommand: pip install -r web_platform/requirements.txt
+    startCommand: python web_platform/server.py
+    envVars:
+      - key: PORT
+        value: 10000
