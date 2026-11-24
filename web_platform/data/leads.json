@@ -1,11 +1,20 @@
 [
   {
+    "id": "lead-aabab629",
+    "name": "Test",
+    "contact": "@test",
+    "budget": "3000",
+    "task": "test",
+    "date": "24.11.2026 13:19",
+    "status": "new"
+  },
+  {
     "id": "lead-440f6e62",
     "name": "виктор",
     "contact": "89398814021",
     "budget": "3 000 ₽",
     "task": "Интересует проект: \"Шоукейс & Лидогенератор для Авито\" (от 3 500 ₽)",
     "date": "24.11.2026 12:26",
-    "status": "new"
+    "status": "in_progress"
   }
 ]

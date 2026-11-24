@@ -10,7 +10,7 @@
   {
     "id": "t2",
     "title": "Ответить первому лиду по боту-магазину",
-    "status": "in_progress",
+    "status": "done",
     "priority": "urgent",
     "price": 4500,
     "deadline": "Срочно"
@@ -18,7 +18,7 @@
   {
     "id": "t3",
     "title": "Подготовить демо-бота для клиента с Авито",
-    "status": "pending",
+    "status": "in_progress",
     "priority": "medium",
     "price": 3000,
     "deadline": "Завтра"

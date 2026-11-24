@@ -374,6 +374,164 @@
       outline: none;
       border-color: var(--primary);
     }
+
+    /* Table Responsive Wrapper */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: none;
+      background: var(--sidebar-bg);
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 18px;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .mobile-menu-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Copy Button & Quick Links */
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-family: var(--font-main);
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: #0f291e;
+      color: #34d399;
+    }
+
+    .toast-info {
+      border-color: rgba(59, 130, 246, 0.4);
+      background: #111e38;
+      color: #60a5fa;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 900px) {
+      body {
+        display: block;
+      }
+      #app-root {
+        flex-direction: column;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .sidebar {
+        width: 100%;
+        display: none;
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+        padding: 16px;
+      }
+      .sidebar.open {
+        display: flex;
+      }
+      .main {
+        padding: 20px 14px;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .stat-card {
+        padding: 14px;
+      }
+      .stat-value {
+        font-size: 1.35rem;
+      }
+      .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .page-title {
+        font-size: 1.35rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -399,6 +557,27 @@
 
   <!-- Protected App Root -->
   <div id="app-root" style="display: none;">
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+      <div class="brand" style="margin-bottom: 0; padding-left: 0;">
+        <div class="brand-icon">
+          <svg class="icon" viewBox="0 0 24 24">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </div>
+        <span>Workspace</span>
+      </div>
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <svg class="icon" viewBox="0 0 24 24">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span>Меню</span>
+      </button>
+    </div>
+
     <!-- Left Sidebar -->
     <aside class="sidebar">
       <div class="brand">
@@ -420,12 +599,31 @@
         </svg>
         <span>Дашборд & CRM</span>
       </div>
+      <div class="nav-item" id="nav-orders" onclick="switchTab('orders-tab')">
+        <svg class="icon" viewBox="0 0 24 24">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span>Заказы из ботов</span>
+        <span id="badge-pending-orders" style="display:none; background: #ef4444; color: white; border-radius: 9999px; padding: 2px 7px; font-size: 0.72rem; font-weight: 700; margin-left: auto;">0</span>
+      </div>
       <div class="nav-item" onclick="switchTab('projects-tab')">
         <svg class="icon" viewBox="0 0 24 24">
           <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
         </svg>
         <span>Кейсы на сайте</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('bot-examples-tab')">
+        <svg class="icon" viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+          <circle cx="12" cy="5" r="2"></circle>
+          <path d="M12 7v4"></path>
+          <line x1="8" y1="16" x2="8" y2="16"></line>
+          <line x1="16" y1="16" x2="16" y2="16"></line>
+        </svg>
+        <span>Примеры ботов (6)</span>
       </div>
       <div class="nav-item" onclick="switchTab('tasks-tab')">
         <svg class="icon" viewBox="0 0 24 24">
@@ -477,38 +675,52 @@
             <div class="stat-label">Всего заявок в CRM</div>
             <div class="stat-value" id="stat-leads-count">0</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Кейсов в каталоге</div>
-            <div class="stat-value" id="stat-projects-count">0</div>
+          <div class="stat-card" style="border-color: rgba(59, 130, 246, 0.35);">
+            <div class="stat-label">Заказов в ботах</div>
+            <div class="stat-value" id="stat-orders-count" style="color: #60a5fa;">0</div>
+          </div>
+          <div class="stat-card" style="border-color: rgba(245, 158, 11, 0.35);">
+            <div class="stat-label">Ожидают обработки</div>
+            <div class="stat-value" id="stat-pending-orders" style="color: #f59e0b;">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">Потенциальный доход</div>
+            <div class="stat-label">Доход (Боты + CRM)</div>
             <div class="stat-value" id="stat-income" style="color: #34d399;">0 ₽</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Минимальный чек</div>
-            <div class="stat-value" style="color: #60a5fa;">3 000 ₽</div>
+        </div>
+
+        <!-- Friend Order Alert Banner -->
+        <div id="friend-order-alert" style="display:none; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 1.6rem;">⭐</span>
+            <div>
+              <div style="font-weight: 700; color: #fbbf24; font-size: 1rem;">Заказ от друга: @Backrunner найден!</div>
+              <div style="font-size: 0.88rem; color: var(--text-muted);" id="friend-alert-desc">Заказ #5: 💎 МЕГА-ПАКЕТ (499 ₽) — статус: ожидает оплаты/выдачи.</div>
+            </div>
           </div>
+          <button onclick="switchTab('orders-tab')" class="btn" style="background: #f59e0b; color: #000; font-weight: 700; padding: 8px 16px;">Посмотреть в Заказах →</button>
         </div>
 
         <div class="card">
           <div class="card-header">
             <h3>Входящие заявки от клиентов</h3>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Дата</th>
-                <th>Клиент</th>
-                <th>Контакты</th>
-                <th>Бюджет</th>
-                <th>Описание задачи</th>
-                <th>Статус</th>
-                <th>Действие</th>
-              </tr>
-            </thead>
-            <tbody id="leads-table-body"></tbody>
-          </table>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Клиент</th>
+                  <th>Контакты</th>
+                  <th>Бюджет</th>
+                  <th>Описание задачи</th>
+                  <th>Статус</th>
+                  <th>Действие</th>
+                </tr>
+              </thead>
+              <tbody id="leads-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -543,18 +755,21 @@
           <div class="card-header">
             <h3>Опубликованные решения</h3>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Название</th>
-                <th>Категория</th>
-                <th>Стоимость</th>
-                <th>Сроки</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="proj-table-body"></tbody>
-          </table>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Категория</th>
+                  <th>Стоимость</th>
+                  <th>Telegram Бот</th>
+                  <th>Сроки</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="proj-table-body"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -587,18 +802,90 @@
           <div class="card-header">
             <h3>Список задач</h3>
           </div>
-          <table>
-            <thead>
-              <tr>
-                <th>Задача</th>
-                <th>Стоимость</th>
-                <th>Дедлайн</th>
-                <th>Статус</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody id="tasks-table-body"></tbody>
-          </table>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Задача</th>
+                  <th>Стоимость</th>
+                  <th>Дедлайн</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="tasks-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Telegram Bot Orders -->
+      <div id="orders-tab" class="tab-content">
+        <div class="top-header">
+          <div>
+            <h1 class="page-title">Заказы из Telegram-ботов (Promt Shop & Support)</h1>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;">Все транзакции и покупки клиентов синхронизируются в реальном времени</p>
+          </div>
+          <button class="btn btn-primary" onclick="refreshData()">
+            <svg class="icon" style="width: 15px; height: 15px;" viewBox="0 0 24 24">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Обновить</span>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <h3>История заказов клиентов</h3>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="setOrderFilter('all')" class="btn" id="filter-btn-all" style="background: rgba(59,130,246,0.25); color:#60a5fa; font-size: 0.8rem;">Все заказы</button>
+              <button onclick="setOrderFilter('pending')" class="btn" id="filter-btn-pending" style="background: rgba(245,158,11,0.15); color:#f59e0b; font-size: 0.8rem;">⏳ Ожидают</button>
+              <button onclick="setOrderFilter('delivered')" class="btn" id="filter-btn-delivered" style="background: rgba(16,185,129,0.15); color:#34d399; font-size: 0.8rem;">✅ Доставлены</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Покупатель</th>
+                  <th>Товар</th>
+                  <th>Сумма</th>
+                  <th>Оплата</th>
+                  <th>Дата</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Bot Examples Gallery -->
+      <div id="bot-examples-tab" class="tab-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;">Примеры ботов (Портфолио проектов)</h2>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">Все 6 готовых ботов из воркспейса для демонстрации клиентам на Авито и прямого запуска</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <a href="/#examples" target="_blank" class="btn" style="background: #2563eb; color: white;">
+              <span>Открыть на сайте с Демо-симулятором</span>
+              <svg class="icon" style="width: 14px; height: 14px; margin-left: 6px;" viewBox="0 0 24 24">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div id="bot-examples-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+          <!-- Rendered dynamically -->
         </div>
       </div>
 
@@ -676,11 +963,42 @@
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      if (event && event.currentTarget) {
-        event.currentTarget.classList.add('active');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      if (window.event && window.event.currentTarget && window.event.currentTarget.classList.contains('nav-item')) {
+        window.event.currentTarget.classList.add('active');
       }
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) sidebar.classList.remove('open');
       refreshData();
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar) sidebar.classList.toggle('open');
+    }
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const t = document.createElement('div');
+      t.className = `toast toast-${type}`;
+      t.innerHTML = `<span>${msg}</span>`;
+      container.appendChild(t);
+      setTimeout(() => t.classList.add('show'), 20);
+      setTimeout(() => {
+        t.classList.remove('show');
+        setTimeout(() => t.remove(), 300);
+      }, 3000);
+    }
+
+    function copyText(text) {
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(`Скопировано: ${text}`, 'success');
+      }).catch(() => {
+        showToast(`Контакт: ${text}`, 'info');
+      });
     }
 
     async function apiFetch(url, options = {}) {
@@ -690,6 +1008,99 @@
         throw new Error('Unauthorized');
       }
       return res;
+    }
+
+    let allOrders = [];
+    let currentOrderFilter = 'all';
+
+    function setOrderFilter(filter) {
+      currentOrderFilter = filter;
+      document.querySelectorAll('#filter-btn-all, #filter-btn-pending, #filter-btn-delivered').forEach(b => {
+        b.style.opacity = '0.6';
+      });
+      const activeBtn = document.getElementById(`filter-btn-${filter}`);
+      if (activeBtn) activeBtn.style.opacity = '1';
+      renderOrders();
+    }
+
+    function renderOrders() {
+      const tbodyOrders = document.getElementById('orders-table-body');
+      if (!tbodyOrders) return;
+
+      const filtered = allOrders.filter(o => {
+        if (currentOrderFilter === 'all') return true;
+        if (currentOrderFilter === 'pending') return o.status === 'pending';
+        if (currentOrderFilter === 'delivered') return o.status === 'delivered';
+        return true;
+      });
+
+      if (!filtered.length) {
+        tbodyOrders.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-dim); padding: 24px;">Заказов в этой категории нет.</td></tr>`;
+        return;
+      }
+
+      tbodyOrders.innerHTML = filtered.map(o => {
+        const isPending = o.status === 'pending';
+        const isFriend = o.is_friend;
+        const tgLink = o.username ? `https://t.me/${o.username.replace('@','')}` : null;
+        
+        const clientHtml = isFriend 
+          ? `<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+               <span style="font-weight:700; color:#fbbf24;">${o.client_label}</span>
+               <span style="background:rgba(245,158,11,0.2); color:#fbbf24; border:1px solid rgba(245,158,11,0.4); font-size:0.68rem; font-weight:800; padding:1px 6px; border-radius:4px;">ДРУГ</span>
+               ${o.username ? `<button onclick="copyText('${o.username}')" class="copy-btn">Копировать</button>` : ''}
+             </div>`
+          : (tgLink ? `<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+               <a href="${tgLink}" target="_blank" style="color:#60a5fa; text-decoration:none; font-weight:600;">${o.client_label}</a>
+               <button onclick="copyText('${o.username || o.user_id}')" class="copy-btn">Копировать</button>
+             </div>` : `<span style="color:var(--text-muted);">${o.client_label}</span>`);
+
+        const methodBadge = o.method === 'stars' 
+          ? `<span style="background:rgba(245,158,11,0.15); color:#fbbf24; padding:2px 6px; border-radius:4px; font-size:0.75rem;">⭐ Stars</span>`
+          : `<span style="background:rgba(59,130,246,0.15); color:#60a5fa; padding:2px 6px; border-radius:4px; font-size:0.75rem;">💳 Перевод</span>`;
+
+        return `
+          <tr style="${isFriend && isPending ? 'background: rgba(245, 158, 11, 0.06);' : ''}">
+            <td style="font-family: var(--font-mono); font-weight: 700;">#${o.id}</td>
+            <td>
+              ${clientHtml}
+              <div style="font-size: 0.75rem; color: var(--text-dim);">ID: ${o.user_id}</div>
+            </td>
+            <td style="font-weight: 600; max-width: 240px;">${o.product_name}</td>
+            <td style="font-family: var(--font-mono); color: #34d399; font-weight: 700;">${o.price_rub} ₽</td>
+            <td>${methodBadge}</td>
+            <td style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${o.created_at}</td>
+            <td>
+              <select onchange="updateOrderStatus(${o.id}, this.value)" class="form-ctrl" style="padding: 4px 8px; font-size: 0.82rem; font-weight: 600; color: ${o.status==='delivered'?'#34d399':(o.status==='pending'?'#f59e0b':'#60a5fa')};">
+                <option value="pending" ${o.status==='pending'?'selected':''}>⏳ Ожидает</option>
+                <option value="paid" ${o.status==='paid'?'selected':''}>💳 Оплачен</option>
+                <option value="delivered" ${o.status==='delivered'?'selected':''}>✅ Выдан</option>
+                <option value="cancelled" ${o.status==='cancelled'?'selected':''}>❌ Отменён</option>
+              </select>
+            </td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                ${isPending ? `<button onclick="updateOrderStatus(${o.id}, 'delivered')" class="btn" style="background: rgba(16,185,129,0.2); color:#34d399; font-size:0.78rem; font-weight:700;">Выдать</button>` : ''}
+                ${tgLink ? `<a href="${tgLink}" target="_blank" class="btn" style="background: rgba(59,130,246,0.15); color:#60a5fa; font-size:0.78rem; text-decoration:none;">Диалог</a>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function updateOrderStatus(orderId, status) {
+      try {
+        await apiFetch(`/api/orders/${orderId}/status`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ status })
+        });
+        showToast('Статус заказа обновлен', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка при обновлении заказа', 'info');
+      }
     }
 
     async function refreshData() {
@@ -704,7 +1115,12 @@
           <tr>
             <td><span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">${l.date}</span></td>
             <td style="font-weight: 600;">${l.name}</td>
-            <td><a href="https://t.me/${(l.contact||'').replace('@','')}" target="_blank" style="color: #60a5fa; text-decoration: none;">${l.contact}</a></td>
+            <td>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <a href="https://t.me/${(l.contact||'').replace('@','')}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: 600;">${l.contact}</a>
+                <button onclick="copyText('${l.contact}')" class="copy-btn" title="Копировать">Копировать</button>
+              </div>
+            </td>
             <td style="font-family: var(--font-mono); color: #34d399; font-weight: 700;">${l.budget}</td>
             <td>${l.task || '—'}</td>
             <td>
@@ -731,6 +1147,13 @@
             <td style="font-weight: 700;">${p.title}</td>
             <td>${p.category}</td>
             <td style="color: #34d399; font-family: var(--font-mono);">${p.price}</td>
+            <td>
+              ${p.bot_username ? `
+                <a href="${p.bot_url || ('https://t.me/' + p.bot_username.replace('@',''))}" target="_blank" style="color: #38bdf8; text-decoration: none; font-size: 0.82rem; font-weight: 600;">
+                  ${p.bot_username} ↗
+                </a>
+              ` : '—'}
+            </td>
             <td>${p.days}</td>
             <td>
               <button onclick="deleteProject('${p.id}')" class="btn" style="background: rgba(239,68,68,0.15); color: #f87171; font-size: 0.8rem;">Удалить</button>
@@ -738,13 +1161,100 @@
           </tr>
         `).join('');
 
-        // 3. Tasks
+        const gridEl = document.getElementById('bot-examples-grid');
+        if (gridEl) {
+          gridEl.innerHTML = projects.map(p => `
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <span style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #60a5fa; background: rgba(59,130,246,0.1); padding: 3px 8px; border-radius: 5px;">${p.category}</span>
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #34d399; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 5px;">${p.badge || 'Готово'}</span>
+                </div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: white; margin-bottom: 8px;">${p.title}</h3>
+                <div style="font-family: var(--font-mono); font-size: 0.75rem; color: #94a3b8; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 6px; margin-bottom: 12px;">
+                  📁 <b>Папка:</b> <code>${p.folder || p.id}</code><br>
+                  ⚡ <b>Стек:</b> ${p.tech || 'Python 3.11 · aiogram 3.x'}
+                </div>
+                <p style="color: var(--text-dim); font-size: 0.86rem; line-height: 1.5; margin-bottom: 14px;">${p.description}</p>
+                <div style="margin-bottom: 16px;">
+                  <div style="font-size: 0.78rem; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">Ключевые возможности:</div>
+                  <ul style="padding-left: 18px; font-size: 0.8rem; color: #94a3b8; line-height: 1.6;">
+                    ${(p.features || []).slice(0, 3).map(f => `<li>${f}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+              <div style="border-top: 1px solid var(--border-color); padding-top: 14px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <div style="font-size: 0.72rem; color: var(--text-dim);">Тариф (строго от 3 000 ₽)</div>
+                  <div style="font-weight: 700; color: #34d399; font-family: var(--font-mono); font-size: 1.05rem;">${p.price}</div>
+                </div>
+                <a href="${p.bot_url || ('https://t.me/' + (p.bot_username || '').replace('@',''))}" target="_blank" class="btn" style="background: rgba(34,158,217,0.18); color: #38bdf8; font-size: 0.82rem; padding: 7px 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                  <svg style="width: 14px; height: 14px; fill: currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.95-1.28 4.91-2.13 5.88-2.55 2.8-1.17 3.38-1.37 3.76-1.38.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24-.01.38z"/></svg>
+                  Запустить в TG ↗
+                </a>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // 3. Bot Orders
+        const resOrders = await apiFetch('/api/orders');
+        allOrders = await resOrders.json();
+        
+        let ordersTotalSum = 0;
+        let pendingOrdersCount = 0;
+        let friendPendingOrder = null;
+
+        allOrders.forEach(o => {
+          if (o.status === 'pending') {
+            pendingOrdersCount++;
+            if (o.is_friend) friendPendingOrder = o;
+          }
+          if (o.status === 'delivered' || o.status === 'paid') {
+            ordersTotalSum += (o.price_rub || 0);
+          }
+        });
+
+        const statOrdersCountEl = document.getElementById('stat-orders-count');
+        if (statOrdersCountEl) statOrdersCountEl.innerText = allOrders.length;
+
+        const statPendingOrdersEl = document.getElementById('stat-pending-orders');
+        if (statPendingOrdersEl) statPendingOrdersEl.innerText = pendingOrdersCount;
+
+        const badgeOrdersEl = document.getElementById('badge-pending-orders');
+        if (badgeOrdersEl) {
+          if (pendingOrdersCount > 0) {
+            badgeOrdersEl.innerText = pendingOrdersCount;
+            badgeOrdersEl.style.display = 'inline-block';
+          } else {
+            badgeOrdersEl.style.display = 'none';
+          }
+        }
+
+        // Friend Order Banner Alert
+        const friendAlertEl = document.getElementById('friend-order-alert');
+        if (friendAlertEl) {
+          if (friendPendingOrder) {
+            friendAlertEl.style.display = 'flex';
+            const descEl = document.getElementById('friend-alert-desc');
+            if (descEl) {
+              descEl.innerText = `Заказ #${friendPendingOrder.id}: ${friendPendingOrder.product_name} (${friendPendingOrder.price_rub} ₽) — ожидает подтверждения и выдачи.`;
+            }
+          } else {
+            friendAlertEl.style.display = 'none';
+          }
+        }
+
+        renderOrders();
+
+        // 4. Tasks & Total Revenue
         const resTasks = await apiFetch('/api/tasks');
         const tasks = await resTasks.json();
         
-        let totalSum = 0;
-        tasks.forEach(t => { if(t.price) totalSum += parseInt(t.price, 10); });
-        document.getElementById('stat-income').innerText = totalSum.toLocaleString('ru-RU') + ' ₽';
+        let tasksIncome = 0;
+        tasks.forEach(t => { if(t.price && t.status === 'done') tasksIncome += parseInt(t.price, 10); });
+        const grandTotal = tasksIncome + ordersTotalSum;
+        document.getElementById('stat-income').innerText = grandTotal.toLocaleString('ru-RU') + ' ₽';
 
         const tbodyTasks = document.getElementById('tasks-table-body');
         tbodyTasks.innerHTML = tasks.map(t => `
@@ -769,47 +1279,72 @@
     }
 
     async function updateLeadStatus(id, status) {
-      await apiFetch(`/api/leads/${id}/status`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ status })
-      });
-      refreshData();
+      try {
+        await apiFetch(`/api/leads/${id}/status`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ status })
+        });
+        showToast('Статус лида обновлен', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка при обновлении', 'info');
+      }
     }
 
     async function deleteProject(id) {
       if(!confirm('Удалить проект с сайта?')) return;
-      await apiFetch(`/api/projects/${id}`, { method: 'DELETE' });
-      refreshData();
+      try {
+        await apiFetch(`/api/projects/${id}`, { method: 'DELETE' });
+        showToast('Проект удален с витрины', 'info');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка удаления', 'info');
+      }
     }
 
     async function toggleTask(id, status) {
-      await apiFetch(`/api/tasks/${id}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ status })
-      });
-      refreshData();
+      try {
+        await apiFetch(`/api/tasks/${id}`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ status })
+        });
+        showToast('Статус задачи обновлен', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка обновления задачи', 'info');
+      }
     }
 
     async function deleteTask(id) {
-      await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
-      refreshData();
+      try {
+        await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+        showToast('Задача удалена', 'info');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка удаления задачи', 'info');
+      }
     }
 
     async function takeLeadToTask(name, budget) {
       const num = parseInt(budget.replace(/\D/g, ''), 10) || 3000;
-      await apiFetch('/api/tasks', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          title: `Сдать заказ клиенту ${name}`,
-          price: num,
-          status: 'in_progress',
-          deadline: '2 дня'
-        })
-      });
-      refreshData();
+      try {
+        await apiFetch('/api/tasks', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            title: `Сдать заказ клиенту ${name}`,
+            price: num,
+            status: 'in_progress',
+            deadline: '2 дня'
+          })
+        });
+        showToast('Заявка перенесена в задачи!', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка переноса в задачи', 'info');
+      }
     }
 
     document.getElementById('add-proj-form').addEventListener('submit', async (e) => {
@@ -822,13 +1357,18 @@
         features: document.getElementById('p-features').value,
         description: document.getElementById('p-desc').value
       };
-      await apiFetch('/api/projects', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      });
-      document.getElementById('add-proj-form').reset();
-      refreshData();
+      try {
+        await apiFetch('/api/projects', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('add-proj-form').reset();
+        showToast('Кейс успешно опубликован на сайт', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка публикации', 'info');
+      }
     });
 
     document.getElementById('add-task-form').addEventListener('submit', async (e) => {
@@ -840,16 +1380,22 @@
         priority: document.getElementById('t-priority').value,
         status: 'pending'
       };
-      await apiFetch('/api/tasks', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      });
-      document.getElementById('add-task-form').reset();
-      refreshData();
+      try {
+        await apiFetch('/api/tasks', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        document.getElementById('add-task-form').reset();
+        showToast('Задача успешно добавлена в работу', 'success');
+        refreshData();
+      } catch (e) {
+        showToast('Ошибка создания задачи', 'info');
+      }
     });
 
     checkAuth();
   </script>
+  <div id="toast-container" class="toast-container"></div>
 </body>
 </html>
