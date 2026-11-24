@@ -2,7 +2,9 @@ import os
 import json
 import uuid
 import datetime
+import asyncio
 from aiohttp import web
+import aiohttp
 
 try:
     from dotenv import load_dotenv
@@ -15,15 +17,42 @@ except ImportError:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 PROJECTS_FILE = os.path.join(DATA_DIR, "projects.json")
 LEADS_FILE = os.path.join(DATA_DIR, "leads.json")
 TASKS_FILE = os.path.join(DATA_DIR, "tasks.json")
+LOCAL_ORDERS_FILE = os.path.join(DATA_DIR, "orders.json")
+EXTERNAL_ORDERS_FILE = os.path.abspath(os.path.join(BASE_DIR, "..", "prompt_shop_bot", "data", "orders.json"))
 
-ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "secret123")
+ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "Viktor_Dev_2026!7x")
 AUTH_COOKIE_NAME = "botcraft_admin_session"
+
+SUPPORT_BOT_TOKEN = os.environ.get("SUPPORT_BOT_TOKEN", "9156937130:AAHk8wFGSEf4y9YN7k1Z5zAkVLKUpjbSvPE")
+ADMIN_ID = int(os.environ.get("ADMIN_ID", "8848097502"))
+PROXY_URL = os.environ.get("PROXY_URL", "http://127.0.0.1:10809")
+WORKSPACE_URL = os.environ.get("WORKSPACE_URL", "https://work-site-1rx5.onrender.com/workspace?token=Viktor_Dev_2026!7x")
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(STATIC_DIR, exist_ok=True)
+
+# Catalog metadata for prompt_shop_bot products
+CATALOG = {
+    "instagram_50": {
+        "name": "🔥 50 промптов для Instagram-контента",
+        "price_rub": 199,
+        "price_stars": 50
+    },
+    "midjourney_30": {
+        "name": "🎨 30 промптов для Midjourney (логотипы и дизайн)",
+        "price_rub": 299,
+        "price_stars": 75
+    },
+    "mega_pack": {
+        "name": "💎 МЕГА-ПАКЕТ: 150 промптов (всё в одном)",
+        "price_rub": 499,
+        "price_stars": 120
+    }
+}
 
 def load_json(filepath, default):
     if not os.path.exists(filepath):
@@ -38,6 +67,69 @@ def load_json(filepath, default):
 def save_json(filepath, data):
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+def load_orders():
+    # If the shop bot orders file exists, prioritize it and sync locally
+    if os.path.exists(EXTERNAL_ORDERS_FILE):
+        orders = load_json(EXTERNAL_ORDERS_FILE, [])
+        save_json(LOCAL_ORDERS_FILE, orders)
+        return orders
+    return load_json(LOCAL_ORDERS_FILE, [])
+
+def save_orders(orders):
+    save_json(LOCAL_ORDERS_FILE, orders)
+    if os.path.exists(os.path.dirname(EXTERNAL_ORDERS_FILE)):
+        try:
+            save_json(EXTERNAL_ORDERS_FILE, orders)
+        except Exception:
+            pass
+
+def enrich_order(o):
+    pid = o.get("product_id", "")
+    prod = CATALOG.get(pid, {"name": pid, "price_rub": 0, "price_stars": 0})
+    user_id = o.get("user_id", 0)
+    username = o.get("username", "") or ""
+    is_friend = (user_id == 7029478583) or (username.lower() == "backrunner")
+    return {
+        **o,
+        "product_name": prod["name"],
+        "price_rub": prod["price_rub"],
+        "price_stars": prod["price_stars"],
+        "is_friend": is_friend,
+        "client_label": f"@{username} (Друг / VIP)" if is_friend else (f"@{username}" if username else f"ID {user_id}")
+    }
+
+async def send_telegram_alert(text: str, reply_markup: dict = None):
+    """Sends notification to Support Hub Bot with proxy & flood-limit handling."""
+    if not SUPPORT_BOT_TOKEN or not ADMIN_ID:
+        return False
+    url = f"https://api.telegram.org/bot{SUPPORT_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": ADMIN_ID,
+        "text": text,
+        "parse_mode": "HTML",
+        "disable_web_page_preview": True
+    }
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
+
+    for proxy in [PROXY_URL, None]:
+        try:
+            timeout = aiohttp.ClientTimeout(total=8)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.post(url, json=payload, proxy=proxy) as resp:
+                    if resp.status == 200:
+                        return True
+                    if resp.status == 429:
+                        data = await resp.json()
+                        retry_after = data.get("parameters", {}).get("retry_after", 2)
+                        await asyncio.sleep(retry_after)
+                        async with session.post(url, json=payload, proxy=proxy) as retry_resp:
+                            if retry_resp.status == 200:
+                                return True
+        except Exception:
+            continue
+    return False
 
 # Initial sample projects if empty
 initial_projects = [
@@ -161,6 +253,31 @@ async def submit_lead(request):
     }
     leads.insert(0, new_lead)
     save_json(LEADS_FILE, leads)
+
+    # Real-time alert to Support Hub bot & Admin Telegram
+    lead_text = (
+        f"🔥 <b>[Сайт BotCraft] Новая заявка на разработку!</b>\n\n"
+        f"👤 <b>Имя:</b> {new_lead['name']}\n"
+        f"📞 <b>Контакт:</b> <code>{new_lead['contact']}</code>\n"
+        f"💰 <b>Бюджет:</b> {new_lead['budget']}\n"
+        f"📝 <b>Задача:</b> {new_lead['task'] or 'Не указана'}\n"
+        f"🕒 <b>Время:</b> {new_lead['date']}"
+    )
+    kb = {
+        "inline_keyboard": [
+            [{"text": "🌐 Открыть Workspace CRM", "url": WORKSPACE_URL}]
+        ]
+    }
+    contact_val = new_lead['contact'].strip()
+    if contact_val.startswith("@"):
+        tg_user = contact_val.lstrip("@")
+        kb["inline_keyboard"].insert(0, [{"text": f"💬 Написать @{tg_user}", "url": f"https://t.me/{tg_user}"}])
+    elif contact_val.replace("+", "").replace(" ", "").isdigit():
+        clean_phone = contact_val.replace("+", "").replace(" ", "")
+        kb["inline_keyboard"].insert(0, [{"text": f"📞 Позвонить / Написать", "url": f"tel:{clean_phone}"}])
+
+    asyncio.create_task(send_telegram_alert(lead_text, kb))
+
     return web.json_response({"status": "ok", "message": "Заявка успешно отправлена! Мы свяжемся с вами в течение 10 минут."})
 
 # Protected Admin API
@@ -206,6 +323,76 @@ async def update_lead_status(request):
             lead["status"] = data.get("status", lead["status"])
     save_json(LEADS_FILE, leads)
     return web.json_response({"status": "ok"})
+
+# Orders API
+@admin_required
+async def get_orders(request):
+    orders = load_orders()
+    enriched = [enrich_order(o) for o in reversed(orders)]
+    return web.json_response(enriched)
+
+@admin_required
+async def update_order_status(request):
+    order_id = int(request.match_info.get("id"))
+    data = await request.json()
+    new_status = data.get("status")
+    orders = load_orders()
+    target_order = None
+    for o in orders:
+        if o.get("id") == order_id:
+            if new_status:
+                o["status"] = new_status
+            target_order = enrich_order(o)
+            break
+    if target_order:
+        save_orders(orders)
+        status_labels = {
+            "pending": "⏳ Ожидает оплаты/проверки",
+            "paid": "💳 Оплачен",
+            "delivered": "✅ Доставлен / Выдан",
+            "cancelled": "❌ Отменен"
+        }
+        alert_text = (
+            f"🔄 <b>Статус заказа #{order_id} изменен в CRM:</b>\n"
+            f"📌 Статус: <b>{status_labels.get(new_status, new_status)}</b>\n"
+            f"👤 Клиент: <b>{target_order['client_label']}</b>\n"
+            f"📦 Товар: <b>{target_order['product_name']}</b>\n"
+            f"💰 Сумма: <b>{target_order['price_rub']} ₽</b>"
+        )
+        asyncio.create_task(send_telegram_alert(alert_text))
+        return web.json_response({"status": "ok", "order": target_order})
+    return web.json_response({"status": "error", "message": "Order not found"}, status=404)
+
+@admin_required
+async def get_crm_stats(request):
+    leads = load_json(LEADS_FILE, [])
+    orders = load_orders()
+    tasks = load_json(TASKS_FILE, [])
+    
+    total_leads = len(leads)
+    new_leads = sum(1 for l in leads if l.get("status") == "new")
+    
+    total_orders = len(orders)
+    pending_orders = sum(1 for o in orders if o.get("status") == "pending")
+    delivered_orders = sum(1 for o in orders if o.get("status") == "delivered")
+    
+    revenue = 0
+    for o in orders:
+        if o.get("status") in ("paid", "delivered"):
+            pid = o.get("product_id")
+            revenue += CATALOG.get(pid, {}).get("price_rub", 0)
+    for t in tasks:
+        if t.get("status") == "done":
+            revenue += int(t.get("price", 0) or 0)
+
+    return web.json_response({
+        "total_leads": total_leads,
+        "new_leads": new_leads,
+        "total_orders": total_orders,
+        "pending_orders": pending_orders,
+        "delivered_orders": delivered_orders,
+        "total_revenue": revenue
+    })
 
 @admin_required
 async def get_tasks(request):
@@ -281,6 +468,9 @@ def create_app():
     app.router.add_post("/api/leads", submit_lead)
     
     # Protected Admin APIs
+    app.router.add_get("/api/stats", get_crm_stats)
+    app.router.add_get("/api/orders", get_orders)
+    app.router.add_post("/api/orders/{id}/status", update_order_status)
     app.router.add_post("/api/projects", add_project)
     app.router.add_delete("/api/projects/{id}", delete_project)
     app.router.add_get("/api/leads", get_leads)
