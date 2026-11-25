@@ -1,5 +1,6 @@
 import os
 import json
+import html
 import uuid
 import datetime
 import asyncio
@@ -28,6 +29,18 @@ ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "Viktor_Dev_2026!7x")
 AUTH_COOKIE_NAME = "botcraft_admin_session"
 
 SUPPORT_BOT_TOKEN = os.environ.get("SUPPORT_BOT_TOKEN", "9156937130:AAHk8wFGSEf4y9YN7k1Z5zAkVLKUpjbSvPE")
+SHOWCASE_BOT_TOKEN = os.environ.get("SHOWCASE_BOT_TOKEN", "").strip()
+if not SHOWCASE_BOT_TOKEN:
+    _showcase_env = os.path.abspath(os.path.join(BASE_DIR, "..", "showcase_lead_bot", ".env"))
+    if os.path.exists(_showcase_env):
+        try:
+            with open(_showcase_env, "r", encoding="utf-8") as _f:
+                for _line in _f:
+                    if _line.strip().startswith("BOT_TOKEN="):
+                        SHOWCASE_BOT_TOKEN = _line.strip().split("=", 1)[1].strip()
+                        break
+        except Exception:
+            pass
 ADMIN_ID = int(os.environ.get("ADMIN_ID", "8848097502"))
 PROXY_URL = os.environ.get("PROXY_URL", "http://127.0.0.1:10809")
 WORKSPACE_URL = os.environ.get("WORKSPACE_URL", "https://work-site-1rx5.onrender.com/workspace?token=Viktor_Dev_2026!7x")
@@ -99,11 +112,12 @@ def enrich_order(o):
         "client_label": f"@{username} (Друг / VIP)" if is_friend else (f"@{username}" if username else f"ID {user_id}")
     }
 
-async def send_telegram_alert(text: str, reply_markup: dict = None):
-    """Sends notification to Support Hub Bot with proxy & flood-limit handling."""
-    if not SUPPORT_BOT_TOKEN or not ADMIN_ID:
+async def send_telegram_alert(text: str, reply_markup: dict = None, bot_token: str | None = None):
+    """Sends notification to Telegram Bot with proxy & flood-limit handling."""
+    token = (bot_token or SUPPORT_BOT_TOKEN or "").strip()
+    if not token or not ADMIN_ID:
         return False
-    url = f"https://api.telegram.org/bot{SUPPORT_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
         "chat_id": ADMIN_ID,
         "text": text,
@@ -130,6 +144,104 @@ async def send_telegram_alert(text: str, reply_markup: dict = None):
         except Exception:
             continue
     return False
+
+
+async def send_admin_alert_with_fallback(text: str, reply_markup: dict = None, prefer_showcase: bool = False) -> bool:
+    """Отправляет уведомление админу, пробуя основной и запасной токен бота."""
+    tokens = [SHOWCASE_BOT_TOKEN, SUPPORT_BOT_TOKEN] if prefer_showcase else [SUPPORT_BOT_TOKEN, SHOWCASE_BOT_TOKEN]
+    seen = set()
+    for token in tokens:
+        if token and token not in seen:
+            seen.add(token)
+            if await send_telegram_alert(text, reply_markup=reply_markup, bot_token=token):
+                return True
+    return False
+
+
+def build_smart_spec(idea: str) -> tuple[str, str, str]:
+    """Подбирает тариф, срок и ключевые модули по описанию клиента."""
+    low = (idea or "").lower()
+    if any(k in low for k in ("ии", "ai", "gpt", "gemini", "нейросет", "mini app", "приложен", "crm")):
+        tier, timing = "Сложный проект (от 5 000 ₽)", "3–5 дней"
+        modules = "• Модуль ИИ-агента / Mini App веб-интерфейса\n• Интеграция с API / CRM и базой знаний\n• Панель администратора и аналитика заявок"
+    elif any(k in low for k in ("магазин", "товар", "доставк", "корзин", "запис", "салон", "клиник", "брон", "оплат")):
+        tier, timing = "Бизнес-бот (от 2 500 ₽)", "2–3 дня"
+        modules = "• Интерактивный каталог / выбор услуги и слота времени\n• Корзина или форма бронирования с автонапоминаниями\n• База данных SQLite/PostgreSQL и уведомления менеджеру"
+    else:
+        tier, timing = "Базовый бот (от 1 000 ₽)", "24 часа"
+        modules = "• Приветственный экран с УТП и быстрыми кнопками\n• Пошаговый сбор заявки / квиз-квалификация клиента\n• Мгновенная пересылка лидов в ваш Telegram"
+    return tier, timing, modules
+
+
+def build_dev_prompt(
+    *,
+    source: str,
+    idea: str,
+    niche: str = "",
+    bot_type: str = "",
+    modules: str = "",
+    timing: str = "",
+    price_info: str = "",
+    contact: str = "",
+) -> str:
+    """Формирует готовый промпт для создания Telegram-бота по описанию клиента."""
+    inferred_tier, inferred_timing, inferred_modules = build_smart_spec(f"{niche} {idea}")
+    final_tier = bot_type or inferred_tier
+    final_timing = timing or inferred_timing
+    final_modules = modules or inferred_modules
+
+    lines = [
+        f"Создай готовый Telegram-бот под ключ по заявке клиента ({source}).",
+        "",
+        "1. Контекст и задача клиента:",
+    ]
+    if niche:
+        lines.append(f"- Ниша: {niche}")
+    if idea:
+        lines.append(f"- Описание от клиента: {idea}")
+    if final_tier:
+        lines.append(f"- Уровень/тариф: {final_tier}")
+    if price_info:
+        lines.append(f"- Ориентир по бюджету: {price_info}")
+    if final_timing:
+        lines.append(f"- Срок: {final_timing}")
+    if contact:
+        lines.append(f"- Контакт заказчика: {contact}")
+
+    lines.extend([
+        "",
+        "2. Обязательный стек и требования:",
+        "- Python 3.11, aiogram 3.x, aiohttp, python-dotenv (виртуальное окружение ..\\prompt_shop_bot\\venv\\Scripts\\python.exe).",
+        "- ОС Windows: подготовь requirements.txt, .env (шаблон/переменные), run.bat в ASCII с CRLF без кириллицы.",
+        "- Надёжность: цикл переподключения и обработка TelegramRetryAfter при отправке сообщений.",
+        "- Удобный UX: понятное главное меню, inline-кнопки, пошаговые FSM-сценарии, пересылка заявок админу (ADMIN_ID).",
+        "",
+        "3. Функциональные модули, которые нужно реализовать:",
+        final_modules,
+        "",
+        "4. Что выдать в результате:",
+        "- Полный рабочий код под ключ (main.py, handlers.py, keyboards.py, config.py, при необходимости db.py).",
+        "- Проверенный синтаксис и готовую инструкцию по запуску.",
+    ])
+    prompt_text = "\n".join(lines)
+    if len(prompt_text) > 3800:
+        prompt_text = prompt_text[:3800] + "\n..."
+    return prompt_text
+
+
+async def notify_admin_lead_and_prompt(
+    lead_text: str,
+    prompt_text: str,
+    reply_markup: dict = None,
+    prefer_showcase: bool = False,
+) -> None:
+    """Отправляет админу карточку заявки и следом готовый промпт для копирования."""
+    await send_admin_alert_with_fallback(lead_text, reply_markup=reply_markup, prefer_showcase=prefer_showcase)
+    prompt_msg = (
+        "🤖 <b>Готовый промпт для сборки бота</b> (нажмите, чтобы скопировать):\n\n"
+        f"<pre>{html.escape(prompt_text)}</pre>"
+    )
+    await send_admin_alert_with_fallback(prompt_msg, prefer_showcase=prefer_showcase)
 
 # Initial sample projects if empty
 initial_projects = [
@@ -315,14 +427,27 @@ async def submit_lead(request):
 
     leads = load_json(LEADS_FILE, [])
     now = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
+    task_text = task or "Консультация и расчет стоимости"
+    tier, timing, modules = build_smart_spec(task_text)
+    prompt_text = build_dev_prompt(
+        source="Сайт BotCraft",
+        idea=task_text,
+        bot_type=tier,
+        modules=modules,
+        timing=timing,
+        price_info=budget,
+        contact=f"{name} ({contact})",
+    )
     new_lead = {
         "id": "lead-" + str(uuid.uuid4())[:8],
         "name": name,
         "contact": contact,
         "budget": budget,
-        "task": task or "Консультация и расчет стоимости",
+        "task": task_text,
         "date": now,
-        "status": "new"
+        "status": "new",
+        "source": "site",
+        "prompt": prompt_text,
     }
     leads.insert(0, new_lead)
     save_json(LEADS_FILE, leads)
@@ -330,10 +455,10 @@ async def submit_lead(request):
     # Real-time alert to Support Hub bot & Admin Telegram
     lead_text = (
         f"🔥 <b>[Сайт BotCraft] Новая заявка на разработку!</b>\n\n"
-        f"👤 <b>Имя:</b> {new_lead['name']}\n"
-        f"📞 <b>Контакт:</b> <code>{new_lead['contact']}</code>\n"
-        f"💰 <b>Бюджет:</b> {new_lead['budget']}\n"
-        f"📝 <b>Задача:</b> {new_lead['task']}\n"
+        f"👤 <b>Имя:</b> {html.escape(new_lead['name'])}\n"
+        f"📞 <b>Контакт:</b> <code>{html.escape(new_lead['contact'])}</code>\n"
+        f"💰 <b>Бюджет:</b> {html.escape(new_lead['budget'])}\n"
+        f"📝 <b>Задача:</b> {html.escape(new_lead['task'])}\n"
         f"🕒 <b>Время:</b> {new_lead['date']}"
     )
     kb = {
@@ -347,11 +472,135 @@ async def submit_lead(request):
         kb["inline_keyboard"].insert(0, [{"text": f"💬 Написать @{tg_user}", "url": f"https://t.me/{tg_user}"}])
     elif contact_val.replace("+", "").replace(" ", "").isdigit():
         clean_phone = contact_val.replace("+", "").replace(" ", "")
-        kb["inline_keyboard"].insert(0, [{"text": f"📞 Позвонить / Написать", "url": f"tel:{clean_phone}"}])
+        kb["inline_keyboard"].insert(0, [{"text": "📞 Позвонить / Написать", "url": f"tel:{clean_phone}"}])
 
-    asyncio.create_task(send_telegram_alert(lead_text, kb))
+    asyncio.create_task(notify_admin_lead_and_prompt(lead_text, prompt_text, reply_markup=kb, prefer_showcase=False))
 
     return web.json_response({"ok": True, "status": "ok", "message": "Заявка успешно отправлена! Мы свяжемся с вами в течение 10 минут."})
+
+
+async def submit_miniapp(request):
+    """Принимает заявки и расчёты из Telegram Mini App, сохраняет в CRM и отправляет админу с готовым промптом."""
+    try:
+        data = await request.json()
+    except Exception:
+        return web.json_response({"ok": False, "error": "Некорректный формат данных."}, status=400)
+
+    action = (data.get("action") or "order").strip()
+    tg_user = data.get("tg_user") if isinstance(data.get("tg_user"), dict) else {}
+    tg_id = tg_user.get("id")
+    tg_username = (tg_user.get("username") or "").strip().lstrip("@")
+    tg_name = " ".join(
+        p for p in [(tg_user.get("first_name") or "").strip(), (tg_user.get("last_name") or "").strip()] if p
+    ).strip()
+
+    user_label = f"@{tg_username}" if tg_username else (tg_name or "Гость Mini App")
+    user_meta = f"@{html.escape(tg_username)}" if tg_username else "без username"
+    if tg_id:
+        user_meta += f" (ID: <code>{html.escape(str(tg_id))}</code>" + (f", {html.escape(tg_name)}" if tg_name else "") + ")"
+    elif tg_name:
+        user_meta += f" ({html.escape(tg_name)})"
+
+    now = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
+
+    if action == "calc":
+        bot_type_raw = str(data.get("bot_type") or "Бот").strip()
+        addons_list = [str(a).strip() for a in (data.get("addons") or []) if str(a).strip()]
+        addons_raw = ", ".join(addons_list) or "без доп. модулей"
+        total = int(data.get("total_rub", 0) or 0)
+        disc = int(data.get("discounted_rub", 0) or 0)
+        idea_text = f"Нужен {bot_type_raw}. Модули: {addons_raw}."
+        price_info = f"от {total:,} ₽ (со скидкой: {disc:,} ₽)"
+        contact_raw = (data.get("contact") or "").strip() or user_label
+
+        prompt_text = build_dev_prompt(
+            source="Калькулятор Mini App",
+            idea=idea_text,
+            bot_type=bot_type_raw,
+            modules=f"• Модули из калькулятора: {addons_raw}",
+            price_info=price_info,
+            contact=contact_raw,
+        )
+        lead_text = (
+            f"📱 <b>Расчёт из Mini App!</b>\n\n"
+            f"👤 {user_meta}\n"
+            f"📌 <b>Уровень:</b> {html.escape(bot_type_raw)}\n"
+            f"⚙️ <b>Модули:</b> {html.escape(addons_raw)}\n"
+            f"💰 <b>Итого:</b> от {total:,} ₽ (со скидкой: {disc:,} ₽)\n"
+            f"🕒 <b>Время:</b> {now}"
+        )
+        new_lead = {
+            "id": "lead-" + str(uuid.uuid4())[:8],
+            "name": tg_name or user_label,
+            "contact": contact_raw,
+            "budget": price_info,
+            "task": idea_text,
+            "date": now,
+            "status": "new",
+            "source": "miniapp_calc",
+            "prompt": prompt_text,
+        }
+    else:
+        niche_raw = str(data.get("niche") or "Не указана").strip()
+        idea_raw = str(data.get("idea") or "").strip()
+        if len(idea_raw) < 3:
+            return web.json_response({"ok": False, "error": "Опишите задачу хотя бы в нескольких словах."}, status=400)
+        contact_raw = str(data.get("contact") or "").strip() or user_label
+        tier, timing, modules = build_smart_spec(f"{niche_raw} {idea_raw}")
+
+        prompt_text = build_dev_prompt(
+            source="Заявка из Mini App",
+            niche=niche_raw,
+            idea=idea_raw,
+            bot_type=tier,
+            modules=modules,
+            timing=timing,
+            price_info=tier,
+            contact=contact_raw,
+        )
+        lead_text = (
+            f"🚀 <b>ЗАЯВКА ИЗ MINI APP!</b>\n\n"
+            f"👤 {user_meta}\n"
+            f"🏷 <b>Ниша:</b> {html.escape(niche_raw)}\n"
+            f"📝 <b>Задача:</b> {html.escape(idea_raw)}\n"
+            f"📞 <b>Контакт:</b> <code>{html.escape(contact_raw)}</code>\n"
+            f"💰 <b>Оценка:</b> {html.escape(tier)} ({html.escape(timing)})\n"
+            f"🕒 <b>Время:</b> {now}"
+        )
+        new_lead = {
+            "id": "lead-" + str(uuid.uuid4())[:8],
+            "name": tg_name or user_label,
+            "contact": contact_raw,
+            "budget": tier,
+            "task": f"[{niche_raw}] {idea_raw}",
+            "date": now,
+            "status": "new",
+            "source": "miniapp_order",
+            "prompt": prompt_text,
+        }
+
+    leads = load_json(LEADS_FILE, [])
+    leads.insert(0, new_lead)
+    save_json(LEADS_FILE, leads)
+
+    kb = {
+        "inline_keyboard": [
+            [{"text": "🌐 Открыть Workspace CRM", "url": WORKSPACE_URL}]
+        ]
+    }
+    if tg_username:
+        kb["inline_keyboard"].insert(0, [{"text": f"💬 Написать @{tg_username}", "url": f"https://t.me/{tg_username}"}])
+    elif contact_raw.startswith("@"):
+        clean_u = contact_raw.lstrip("@")
+        kb["inline_keyboard"].insert(0, [{"text": f"💬 Написать @{clean_u}", "url": f"https://t.me/{clean_u}"}])
+
+    asyncio.create_task(notify_admin_lead_and_prompt(lead_text, prompt_text, reply_markup=kb, prefer_showcase=True))
+
+    return web.json_response({
+        "ok": True,
+        "status": "ok",
+        "message": "Заявка отправлена! Разработчик уже получил ТЗ и скоро напишет вам.",
+    })
 
 # Protected Admin API
 @admin_required
@@ -543,6 +792,7 @@ def create_app():
     # Public APIs
     app.router.add_get("/api/projects", get_projects)
     app.router.add_post("/api/leads", submit_lead)
+    app.router.add_post("/api/miniapp/submit", submit_miniapp)
     
     # Protected Admin APIs
     app.router.add_get("/api/stats", get_crm_stats)

@@ -1,9 +1,9 @@
 @echo off
-chcp 65001 > nul
-title BotCraft Web Platform & Workspace
-
+title BotCraft Web Platform CRM
 echo Starting BotCraft Web Platform...
-echo Python: ..\prompt_shop_bot\venv\Scripts\python.exe
-
-"..\prompt_shop_bot\venv\Scripts\python.exe" server.py
+if exist "..\prompt_shop_bot\venv\Scripts\python.exe" (
+    "..\prompt_shop_bot\venv\Scripts\python.exe" server.py
+) else (
+    python server.py
+)
 pause

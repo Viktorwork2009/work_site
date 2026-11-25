@@ -414,7 +414,24 @@
       el.classList.add('selected');
     }
 
-    function sendCalcToBot() {
+    async function submitToServer(payload) {
+      const body = {
+        ...payload,
+        tg_user: tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user : null
+      };
+      const resp = await fetch('/api/miniapp/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok || !data.ok) {
+        throw new Error(data.error || 'Ошибка отправки');
+      }
+      return data;
+    }
+
+    async function sendCalcToBot() {
       haptic('medium');
       const addons = getAddons();
       const total = basePrice + addons.sum;
@@ -425,14 +442,21 @@
         total_rub: total,
         discounted_rub: Math.round(total * 0.85)
       };
-      if (tg) {
-        tg.sendData(JSON.stringify(payload));
-      } else {
-        showToast(`Расчёт: от ${total.toLocaleString('ru-RU')} ₽ (откройте через Telegram)`);
+      try {
+        await submitToServer(payload);
+        showToast(`✅ Расчёт (от ${total.toLocaleString('ru-RU')} ₽) отправлен разработчику!`);
+      } catch (err) {
+        if (tg && tg.sendData) {
+          try {
+            tg.sendData(JSON.stringify(payload));
+            return;
+          } catch (e) {}
+        }
+        showToast(err.message || `Расчёт: от ${total.toLocaleString('ru-RU')} ₽`);
       }
     }
 
-    function sendOrderToBot() {
+    async function sendOrderToBot() {
       haptic('medium');
       const niche = document.querySelector('#niche-chips .chip.selected')?.textContent || 'Другое';
       const idea = document.getElementById('order-idea').value.trim();
@@ -442,10 +466,18 @@
         return;
       }
       const payload = { action: 'order', niche, idea, contact };
-      if (tg) {
-        tg.sendData(JSON.stringify(payload));
-      } else {
-        showToast('Заявка сформирована (откройте Mini App в Telegram)');
+      try {
+        const res = await submitToServer(payload);
+        document.getElementById('order-idea').value = '';
+        showToast('✅ ' + (res.message || 'Заявка отправлена!'));
+      } catch (err) {
+        if (tg && tg.sendData) {
+          try {
+            tg.sendData(JSON.stringify(payload));
+            return;
+          } catch (e) {}
+        }
+        showToast(err.message || 'Не удалось отправить заявку');
       }
     }
 
